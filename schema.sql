@@ -25,6 +25,13 @@ CREATE TABLE roles(
     PRIMARY KEY (id) 
 );
 
+ALTER TABLE employees
+ADD FOREIGN KEY (role_id) REFERENCES roles(id),
+ADD FOREIGN KEY (manager_id) REFERENCES employees(id);
+
+ALTER TABLE roles
+ADD FOREIGN KEY (department_id) REFERENCES departments(id);
+
 INSERT INTO employees (first_name, last_name)
 VALUES ("Jeremiah", "Trotter"),
 ("Jerome", "Jurenovich"),
