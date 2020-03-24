@@ -12,13 +12,11 @@ CREATE TABLE employees (
     manager_id INT NULL,
     PRIMARY KEY (id)
 );
-
 CREATE TABLE departments (
     id INT AUTO_INCREMENT NOT NULL,
     name VARCHAR(30),
     PRIMARY KEY (id)
 );
-
 CREATE TABLE roles(
     id INT AUTO_INCREMENT NOT NULL,
     title VARCHAR(30),
@@ -26,5 +24,26 @@ CREATE TABLE roles(
     department_id INT,
     PRIMARY KEY (id) 
 );
+
+INSERT INTO employees (first_name, last_name)
+VALUES ("Jeremiah", "Trotter"),
+("Jerome", "Jurenovich"),
+("Barkevious", "Mingo"),
+("D'Brickashaw", "Ferguson"),
+("Gerald", "Gjere");
+
+INSERT INTO departments (name)
+VALUES ("Engineering"),
+("Custodial Technicians"),
+("Human Resources"),
+("Middle Management"),
+("HMFIC");
+
+INSERT INTO roles (title, salary)
+VALUES ("Bossman", 1000000),
+("Squeak", 10000),
+("Waste of Space", 50000),
+("Go getter", 42000);
+
 
 SELECT * FROM employees;
