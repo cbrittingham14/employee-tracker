@@ -89,7 +89,7 @@ async function makeQuery (selection){
             return "SELECT * FROM departments";
         case 'view_roles':
             return "SELECT * FROM roles";
-        case 'add_role':
+        case 'add_roles':
             addRole();
             return  "INSERT";
         case 'add_dep':
@@ -109,8 +109,35 @@ async function makeQuery (selection){
     }
 }
 async function addRole(){
+     try{   
+        let departments = await c.query("SELECT departments.id, departments.name, SUM(roles.salary) AS utilized_budget FROM employees LEFT JOIN roles on employees.role_id = roles.id LEFT JOIN departments on roles.department_id = departments.id GROUP BY departments.id, departments.name;")
+        console.log(departments);
+        const departmentChoices = departments.map(({ id, name }) => ({
+            name: name,
+            value: id
+        }));
 
+        const role = await prompt([
+            {
+            type: "list",
+            name: "department_id",
+            message: "Which department does the role belong to?",
+            choices: departmentChoices
+            },
+            {
+            name: "salary",
+            message: "What is the salary of the role?"
+            },
+            {
+            name: "title",
+            message: "What is the name of the role?"
+            },
+        ]);
+        await c.query("INSERT INTO roles SET ?", role);
 
+     }
+     catch{if(err) throw err};
+     queryUser()
 }
 async function addDepartment(){
     try{
@@ -161,6 +188,8 @@ async function addEmployee(){
     queryUser();
 }
 async function updateRole(){
+    
+    queryUser();
     
 }
 function quit(){
