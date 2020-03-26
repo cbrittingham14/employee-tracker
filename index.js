@@ -34,7 +34,7 @@ const choices = [
     },
     {
         name: "Quit",
-        value: "QUIT"
+        value: "quit"
     }
 ];
 // MySQL DB Connection Information (remember to change this with our specific credentials)
@@ -51,8 +51,7 @@ c.connect(function(err) {
     console.log("connected as id " + c.threadId + "\n");
   });
 
-// const connectAsync = util.promisify(c.connect);
- c.query = util.promisify(c.query).bind(c);
+ c.query = util.promisify(c.query);
 
 queryUser();
 
@@ -86,8 +85,6 @@ async function makeQuery (selection){
     switch (selection){
         case 'view_emp':
             return "SELECT * FROM employees";
-            // let c = await queryAsync("SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department on role.department_id = department.id LEFT JOIN employee manager on manager.id = employee.manager_id;");
-            console.table(c);
         case 'view_dep':
             return "SELECT * FROM departments";
         case 'view_roles':
@@ -104,6 +101,8 @@ async function makeQuery (selection){
         case 'update_role':
             updateRole();
             return "";
+        case 'quit':
+            quit();
         default:
             console.log("didnt catch a case");
             return "quit";
@@ -111,15 +110,21 @@ async function makeQuery (selection){
 }
 async function addRole(){
 
+
 }
 async function addDepartment(){
-    const department = await prompt([
-        {
-          name: "name",
-          message: "What is the name of the department?"
-        }
-      ]);
-      c.query("INSERT INTO departments SET ?", department);
+    try{
+        const department = await prompt([
+            {
+            name: "name",
+            message: "What is the name of the department?"
+            }
+        ]);
+        c.query("INSERT INTO departments SET ?", department);
+    }
+    catch{if(error) throw error;
+    }
+    queryUser();
 }
 async function addEmployee(){
     try{
@@ -152,9 +157,12 @@ async function addEmployee(){
 
         await c.query("INSERT INTO employees SET ?", newEmployee);
     }
-    catch{err => console.log(err)};
-    
+    catch{if(error) throw error};
+    queryUser();
 }
 async function updateRole(){
     
+}
+function quit(){
+    process.exit();
 }
