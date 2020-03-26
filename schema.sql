@@ -25,19 +25,12 @@ CREATE TABLE roles(
     PRIMARY KEY (id) 
 );
 
-ALTER TABLE employees
-ADD FOREIGN KEY (role_id) REFERENCES roles(id),
-ADD FOREIGN KEY (manager_id) REFERENCES employees(id);
-
-ALTER TABLE roles
-ADD FOREIGN KEY (department_id) REFERENCES departments(id);
-
-INSERT INTO employees (first_name, last_name)
-VALUES ("Jeremiah", "Trotter"),
-("Jerome", "Jurenovich"),
-("Barkevious", "Mingo"),
-("D'Brickashaw", "Ferguson"),
-("Gerald", "Gjere");
+INSERT INTO employees (first_name, last_name, role_id)
+VALUES ("Jeremiah", "Trotter", 1),
+("Jerome", "Jurenovich",2),
+("Barkevious", "Mingo",4),
+("D'Brickashaw", "Ferguson",4),
+("Gerald", "Gjere",2);
 
 INSERT INTO departments (name)
 VALUES ("Engineering"),
@@ -46,11 +39,18 @@ VALUES ("Engineering"),
 ("Middle Management"),
 ("HMFIC");
 
-INSERT INTO roles (title, salary)
-VALUES ("Bossman", 1000000),
-("Squeak", 10000),
-("Waste of Space", 50000),
-("Go getter", 42000);
+INSERT INTO roles (title, salary, department_id)
+VALUES ("Bossman", 1000000, 5),
+("Squeak", 10000, 2),
+("Waste of Space", 50000, 3),
+("Go getter", 42000, 1);
+
+ALTER TABLE employees
+ADD FOREIGN KEY (role_id) REFERENCES roles(id),
+ADD FOREIGN KEY (manager_id) REFERENCES employees(id);
+
+ALTER TABLE roles
+ADD FOREIGN KEY (department_id) REFERENCES departments(id);
 
 
 SELECT * FROM employees;
