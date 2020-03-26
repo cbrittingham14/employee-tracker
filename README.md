@@ -16,3 +16,7 @@ run "npm install" in the command line to get the required modules.
 
 run "npm start" to execute the app.
 
+
+## Acknowledgements
+
+Used code provided by the class for reference.
