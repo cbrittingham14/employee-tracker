@@ -32,6 +32,10 @@ const choices = [
         name: "Update employee role",
         value: "update_role",
     },
+    {
+        name: "Quit",
+        value: "QUIT"
+    }
 ];
 // MySQL DB Connection Information (remember to change this with our specific credentials)
 const c = mysql.createConnection({
@@ -48,7 +52,10 @@ c.connect(function(err) {
   });
 
 // const connectAsync = util.promisify(c.connect);
-const queryAsync = util.promisify(c.query).bind(c);
+ c.query = util.promisify(c.query).bind(c);
+
+queryUser();
+
 
 async function queryUser() {
     try{
@@ -61,25 +68,22 @@ async function queryUser() {
         console.log("selection ", selection);
         
         let query = await makeQuery(selection);
+        
 
-        let data = await queryAsync(query);
+        let data = await c.query(query);
         console.table(data);
-        // c.query(query, function(err, data){
-        //     if(err) throw err;
-        //     console.table(data);
-        // });
 
     }
     catch {
-        if(err) throw err;
+        if(Error) throw Error;
     }
     queryUser();
 }
-queryUser();
 
-async function makeQuery (sel){
-    let query;
-    switch (sel){
+
+async function makeQuery (selection){
+    
+    switch (selection){
         case 'view_emp':
             return "SELECT * FROM employees";
             // let c = await queryAsync("SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department on role.department_id = department.id LEFT JOIN employee manager on manager.id = employee.manager_id;");
@@ -88,21 +92,69 @@ async function makeQuery (sel){
             return "SELECT * FROM departments";
         case 'view_roles':
             return "SELECT * FROM roles";
-        case '':
-            query = "";
-        case '':
-            query = "";
+        case 'add_role':
+            addRole();
+            return  "INSERT";
+        case 'add_dep':
+            addDepartment();
+            return  "";
+        case 'add_emp':
+            addEmployee();
+            return ""
+        case 'update_role':
+            updateRole();
+            return "";
         default:
             console.log("didnt catch a case");
-    // sendQuery(query);
+            return "quit";
     }
 }
+async function addRole(){
 
-// // async function sendQuery(q){
-// //     await queryAsync(q);
-// // }
+}
+async function addDepartment(){
+    const department = await prompt([
+        {
+          name: "name",
+          message: "What is the name of the department?"
+        }
+      ]);
+      c.query("INSERT INTO departments SET ?", department);
+}
+async function addEmployee(){
+    try{
+        let roles = await c.query("SELECT roles.id, roles.title, departments.name AS departments, roles.salary FROM roles LEFT JOIN departments on roles.department_id = departments.id;");
+        
+        const newEmployee = await prompt([
+            {
+            name: "first_name",
+            message: "What is the employee's first name?"
+            },
+            {
+            name: "last_name",
+            message: "What is the employee's last name?"
+            }
+        ]);
 
-// c.query("SELECT * FROM employees", (err, result)=>{
-//     if(err) throw err;
-//     console.log(result);
-// });
+        let roleOptions = roles.map(({ id, title }) => ({
+            name: title,
+            value: id
+        }));
+
+        let { roleId } = await prompt({
+            type: "list",
+            name: "roleId",
+            message: "What is the employee's role?",
+            choices: roleOptions
+        });
+        
+        newEmployee.role_id = roleId;
+
+        await c.query("INSERT INTO employees SET ?", newEmployee);
+    }
+    catch{err => console.log(err)};
+    
+}
+async function updateRole(){
+    
+}
